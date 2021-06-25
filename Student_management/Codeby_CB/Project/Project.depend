@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1584205420 source:c:\users\acer\desktop\project_c\codeby_cb\project\main.c
+	<stdio.h>
+	<stdlib.h>
+
+1624441632 source:c:\users\acer\desktop\project_c\codeby_cb\project\stack.c
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<conio.h>
+	<stdbool.h>
+	<ctype.h>
+

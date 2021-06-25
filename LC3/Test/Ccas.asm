@@ -1,0 +1,479 @@
+
+; TOPIC 1 OF LC3 PROJECT
+
+.ORIG	x3000
+;******************************************* MAIN PROGRAM ***********************************************
+
+;******************************************* INPUT SECOND NUMBER ******************************************
+SO1 .STRINGZ "NUMBER1: "
+LEA R0,SO1
+PUTS
+GETC
+OUT
+JSR CHECK
+
+STI R0,MEM1
+
+;*********************************************INPUT SECOND NUMBER *******************************************
+SO2 .STRINGZ "\nNUMBER2: "
+LEA R0,SO2
+PUTS
+GETC 
+OUT
+JSR CHECK
+STI R0,MEM2
+
+LDI R1,MEM1	;R1 ALWAYS EQUAL TO THE VALUE OF MEM1 SO DON'T USE R1 IN SUBROUTINE LIKE THE COUNTER
+LDI R2,MEM2	;R2 ALWAYS EQUAL TO THE VALUE OF MEM2 SO DON'T USE R2 IN SUBROUTINE LIKE THE COUNTER
+
+
+;*********************************************** ADDITION ******************************************
+CONG .STRINGZ "\nSUM: "
+LEA R0,CONG
+PUTS
+
+ADD R3,R1,R2
+JSR CHECK_POSITIVE
+JSR OUTPUT
+
+;************************************************ MINUS *******************************************
+TRU .STRINGZ "\nDIFFERENCE: "
+LEA R0,TRU
+PUTS
+
+NOT R2,R2
+ADD R2,R2,#1
+ADD R3,R1,R2
+
+JSR CHECK_POSITIVE
+JSR OUTPUT
+
+;************************************************ MULTIPLICATION ***********************************
+
+NHAN .STRINGZ "\nPRODUCT: "
+LEA R0,NHAN
+PUTS
+
+JSR CHECK_POSITIVE_2
+JSR MULTI_CAL
+JSR TWO_NUM_MUL
+JSR OUTPUT
+
+;************************************************* DIVISION ******************************************
+thuong .STRINGZ "\nQUOTIENT: "
+LEA R0,thuong
+PUTS
+JSR CHECK_DEVIDER
+JSR DIVISION
+
+sothuc .STRINGZ "\nREAL NUMBER: "
+LEA R0,sothuc
+PUTS
+JSR CHECK_DEVIDER
+JSR REAL_NUMBER
+
+
+HALT
+;*********************************************** END OF MAIN PROGRAM *******************************************
+
+;**************************************************SUBROUTINE CHECK ********************************************
+
+CHECK
+ST R7,SAVER7 
+
+AND R4,R4,#0
+LD R2,N_ASCII
+LD R3,DTRU
+LD R5,HANGCHUC	
+	
+ADD R3,R0,R3
+
+BRz BACK ;LON HON KHONG
+ADD R0,R0,R2
+
+ADD R4,R4,R0
+ADD R5,R5,#-1
+BRp #-3
+GETC 
+OUT
+ADD R0,R0,R2
+ADD R0,R4,R0
+LD R7,SAVER7
+RET
+
+
+BACK 	
+
+GETC
+OUT
+ADD R0,R0,R2
+
+ADD R4,R4,R0
+ADD R5,R5,#-1
+BRp #-3
+GETC 
+OUT
+ADD R0,R0,R2
+ADD R0,R4,R0
+
+NOT R0,R0
+ADD R0,R0,#1
+LD R7,SAVER7
+RET
+
+;*********************************************** SUBROUTINE CHECK POSITIVE *******************************
+CHECK_POSITIVE
+ST R7,SAVER7_1
+
+BRn AM
+LD R7,SAVER7_1
+RET
+
+AM 
+JSR MINUS_SIGN
+
+NOT R3,R3
+ADD R3,R3,#1	;CHUYEN THANHG DUONG
+LD R7,SAVER7_1
+RET
+;********************************************** SUBROUTINE OUTPUT RESULT *****************************************
+OUTPUT
+					;COUNTER DUNG REGISTER KHAC R1 && R2
+ST R7,SAVER7
+LD R5,ASCII
+			
+AND R4,R4,#0
+
+LD R6,AMHANGNGHIN
+ADD R4,R4,#1
+ADD R3,R3,R6
+BRzp #-3
+
+ADD R4,R4,#-1
+ADD R0,R4,R5
+OUT
+
+AND R4,R4,#0
+
+LD R6,HANGNGHIN
+ADD R3,R3,R6
+LD R6,AMHANGTRAM
+ADD R4,R4,#1
+ADD R3,R3,R6
+BRzp #-3
+
+ADD R4,R4,#-1
+ADD R0,R4,R5
+OUT
+
+AND R4,R4,#0
+LD R6,HANGTRAM
+ADD R3,R3,R6
+LD R6,AMHANGCHUC
+ADD R4,R4,#1
+ADD R3,R3,R6
+BRzp #-3
+
+ADD R4,R4,#-1
+ADD R0,R4,R5
+OUT
+
+ADD R3,R3,#10
+ADD R0,R3,R5
+OUT
+
+LD R7,SAVER7
+RET
+
+;***************************************** SUBROUTINE MULTIPLICATION **************************************
+MULTI_CAL
+
+ST R7,SAVER7
+ADD R3,R1,#0
+
+BRn MINUS ;R1 DUONG
+ADD R3,R2,#0
+BRn MINUS1 ;R2 DUONG	
+LD R7,SAVER7
+RET
+
+	
+MINUS1 ;R2 AM	
+NOT R2,R2
+ADD R2,R2,#1	
+LD R7,SAVER7
+RET
+
+
+MINUS ;R1 AM
+NOT R1,R1
+ADD R1,R1,#1
+ADD R3,R2,#0
+BRn MINUS2 ;R2 DUONG	
+LD R7,SAVER7
+RET
+
+	
+MINUS2 ;R2 AM
+NOT R2,R2
+ADD R2,R2,#1	
+LD R7,SAVER7
+RET
+
+	
+;****************************************SUBROUTINE 2 NUMBER MULTIPLICATION ***********************************
+TWO_NUM_MUL
+ST R7,SAVER7
+AND R3,R3,#0
+ADD R2,R2,#-1
+BRn #4
+ADD R2,R2,#1
+ADD R3,R3,R1
+ADD R2,R2,#-1
+BRnp #-3
+LD R7,SAVER7
+RET
+
+;-------------------------------------SUBROUTINE CHECK_POSITIVE_2-------------------------------------;
+CHECK_POSITIVE_2
+
+ST R7,SAVER7_1
+LDI R1,MEM1
+BRnz NEGAV ;R1 LON HON 0
+LDI R2,MEM2
+BRn NEGAVE ;R2 LON HON BANG 0
+LD R7,SAVER7_1
+RET
+
+NEGAVE
+JSR MINUS_SIGN
+LD R7,SAVER7_1
+RET
+NEGAV ;R1 AM HOAC BANG 0	
+BRn POS ;R1 BANG 0
+LD R7,SAVER7_1
+RET
+
+POS ;R1 AM 
+LDI R2,MEM2
+BRn NEGAVE1 ;R2 LON HON BANG 0
+BRz POS1
+JSR MINUS_SIGN
+LD R7,SAVER7_1
+RET
+POS1 ;R2 BANG 0
+LD R7,SAVER7_1
+RET
+
+NEGAVE1 ;R2 AM
+LD R7,SAVER7_1
+RET
+
+;******************************************SUBROUTINE MINUS_SIGN******************************
+MINUS_SIGN
+ST R7,SAVER7
+LEA R0,dtru
+PUTS
+LD R7,SAVER7
+RET
+
+;************************************** REFERENCE ********************************
+N_ASCII .FILL #-48
+ASCII .FILL #48
+DTRU .FILL #-45	
+
+MEM1 .FILL x4000
+MEM2 .FILL x4001
+MEM3 .FILL x4002
+MEM4 .FILL x4003
+
+HANGNGHIN .FILL #1000
+HANGTRAM .FILL #100
+HANGCHUC .FILL #10
+
+AMHANGNGHIN .FILL #-1000
+AMHANGTRAM .FILL #-100
+AMHANGCHUC .FILL #-10
+
+
+SAVER7_1 .BLKW 1
+SAVER7 .BLKW 1
+
+
+;*****************************************SUBROUTINE DIVIRDER **********************************
+CHECK_DEVIDER
+ST R7,SAVER7_1
+
+LDI R1,MEM1
+BRnz NEGAV1 ;R1 LON HON 0
+LDI R2,MEM2
+BRn NEGAVE9 ;R2 LON HON BANG 0		
+BRp POS9 ;R2 BANG 0
+LEA R0,khongcophepchia
+PUTS
+HALT
+
+POS9 		;R2 LON HON 0 ;R1 LON HON 0
+NOT R2,R2
+ADD R2,R2,#1 	;CHUYEN R2 THANH SO AM DE LAM PHEP CHIA
+LD R7,SAVER7_1
+RET
+
+NEGAVE9 ;R2 AM		;R1 LON HON 0
+JSR MINUS_SIGN
+LD R7,SAVER7_1
+RET
+
+NEGAV1 ;R1 AM HOAC BANG 0
+BRn POS2 ;R1 BANG 0
+LDI R2,MEM2
+BRn NEGAVE2 ;R2 LON HON BANG 0		
+BRp POS3 ;R2 BANG 0
+LEA R0,khongcophepchia
+PUTS
+HALT
+
+POS3 ;R2 LON HON 0			;R1 BANG 0
+NOT R2,R2
+ADD R2,R2,#1	;CHUYEN R2 THANH SO AM DE LAM PHEP CHIA
+LD R7,SAVER7_1
+RET
+
+NEGAVE2 ;R2 AM		;R1 BANG 0
+LD R7,SAVER7_1
+RET
+
+POS2 ;R1 AM 
+LDI R2,MEM2
+BRn NEGAVE3 ;R2 LON HON BANG 0
+BRz POS4 ;R2 LON HON 0		;R1 AM 
+
+NOT R1,R1
+ADD R1,R1,#1
+NOT R2,R2
+ADD R2,R2,#1
+JSR MINUS_SIGN
+LD R7,SAVER7_1
+RET
+
+POS4 	;R2 BANG 0
+LEA R0,khongcophepchia
+PUTS
+HALT
+
+NEGAVE3 ;R2 AM	;R1 AM 
+NOT R1,R1
+ADD R1,R1,#1
+LD R7,SAVER7_1
+RET
+
+;************************************SUBROUTINE DEVISION*********************************
+DIVISION
+ST R7,SAVER7_1
+
+AND R3,R3,#0	;R3 IS THE COUNTER
+ADD R3,R3,#1	
+ADD R1,R1,R2	
+BRzp #-3
+ADD R3,R3,#-1
+ST R3,MEM3	;MEM3 PHAN NGUYEN 
+JSR OUTPUT	;XUAT THUONG_SO
+NOT R2,R2
+ADD R2,R2,#1	;CHUYEN LAI THANH SO DUONG DE XUAT SO DU
+ADD R1,R1,R2
+ST R1,MEM4	;MEM4 PHAN THUC
+LEA R0,phandu
+PUTS
+LD R1,MEM4
+LDI R4,MEM1	;SO THU NHAT
+BRnp POSITIVE	;R4 BANG 0
+LDI R5,MEM2 	;SO THU HAI
+			
+BRp NNLG 	;R5 AM
+
+LEA R0,dtru
+PUTS	
+NOT R3,R5
+ADD R3,R3,#1	
+JSR OUTPUT	
+LD R7,SAVER7_1
+RET	
+
+NNLG ;R5 DUONG
+ADD R3,R5,#0
+JSR OUTPUT	
+LD R7,SAVER7_1
+RET
+
+POSITIVE ;R4 AM HOAC DUONG	
+BRp NNGL1 ;R4 AM
+LEA R0,dtru
+PUTS
+ADD R3,R1,#0
+JSR OUTPUT	
+LD R7,SAVER7_1
+RET	
+
+NNGL1 ;R4 DUONG
+ADD R3,R1,#0
+JSR OUTPUT	
+LD R7,SAVER7_1
+RET
+
+
+;**************************************SUBROUTINE REAL NUMBER************************************
+REAL_NUMBER
+ST R7,SAVER7_1
+
+LD R3,MEM3
+JSR OUTPUT
+LEA R0,dcham
+PUTS
+LD R4,MEM4 	;BRp NNLG4
+AND R5,R5,#0
+LD R6,HANGCHUC
+LD R1,ASCII
+ADD R5,R5,R4	;nhan 10 len
+ADD R6,R6,#-1
+BRp #-3
+LDI R3,MEM2
+BRp NNLG3 	;R3 AM
+BRnzp #3
+NNLG3
+NOT R3,R3   
+ADD R3,R3,#1	;chuyen lai thanh so am cua a
+AND R6,R6,#0
+ADD R6,R6,#1	;thuc hien phep chia 
+ADD R5,R5,R3
+BRzp #-3
+ADD R6,R6,#-1
+ADD R0,R6,R1
+OUT
+
+NOT R3,R3
+ADD R3,R3,#1	;chuyen lai thanh so duong
+ADD R5,R5,R3	;chuan bi nhan len 10 lai
+AND R2,R2,#0
+LD R6,HANGCHUC
+ADD R2,R2,R5;nhan 10 len
+ADD R6,R6,#-1
+BRp #-3
+NOT R3,R3   
+ADD R3,R3,#1	;chuyen lai thanh so am cua a	
+AND R6,R6,#0
+ADD R6,R6,#1	;thuc hien phep chia 
+ADD R2,R2,R3
+BRzp #-3
+ADD R6,R6,#-1
+ADD R0,R6,R1
+OUT
+LD R7,SAVER7_1
+RET
+
+;*********************************REFERENCE******************************
+phandu .STRINGZ "\nREMAINDER: "
+khongcophepchia .STRINGZ "\nINVALID DIVISION"
+dtru .STRINGZ "-"
+dcham .STRINGZ "."
+
+.END
